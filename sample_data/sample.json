@@ -1,0 +1,49 @@
+[
+  {"product": "SearchEngine", "version": "v1.0", "config": "8Core16GB",  "data_size": 100000,  "threads": 100, "tps": 445.2, "response_sec": 0.22, "error_pct": 0.0, "cpu_avg": 71.4},
+  {"product": "SearchEngine", "version": "v1.0", "config": "8Core16GB",  "data_size": 500000,  "threads": 100, "tps": 318.7, "response_sec": 0.31, "error_pct": 0.0, "cpu_avg": 78.2},
+  {"product": "SearchEngine", "version": "v1.0", "config": "8Core16GB",  "data_size": 1000000, "threads": 100, "tps": 241.3, "response_sec": 0.41, "error_pct": 0.1, "cpu_avg": 83.5},
+  {"product": "SearchEngine", "version": "v1.0", "config": "8Core16GB",  "data_size": 5000000, "threads": 100, "tps": 131.6, "response_sec": 0.76, "error_pct": 0.2, "cpu_avg": 89.1},
+  {"product": "SearchEngine", "version": "v1.0", "config": "8Core16GB",  "data_size": 10000000,"threads": 100, "tps": 92.4,  "response_sec": 1.08, "error_pct": 0.5, "cpu_avg": 93.7},
+
+  {"product": "SearchEngine", "version": "v1.0", "config": "16Core32GB", "data_size": 100000,  "threads": 200, "tps": 843.6, "response_sec": 0.12, "error_pct": 0.0, "cpu_avg": 65.3},
+  {"product": "SearchEngine", "version": "v1.0", "config": "16Core32GB", "data_size": 500000,  "threads": 200, "tps": 604.1, "response_sec": 0.17, "error_pct": 0.0, "cpu_avg": 72.8},
+  {"product": "SearchEngine", "version": "v1.0", "config": "16Core32GB", "data_size": 1000000, "threads": 200, "tps": 458.9, "response_sec": 0.22, "error_pct": 0.0, "cpu_avg": 78.4},
+  {"product": "SearchEngine", "version": "v1.0", "config": "16Core32GB", "data_size": 5000000, "threads": 200, "tps": 249.7, "response_sec": 0.40, "error_pct": 0.1, "cpu_avg": 85.2},
+  {"product": "SearchEngine", "version": "v1.0", "config": "16Core32GB", "data_size": 10000000,"threads": 200, "tps": 175.2, "response_sec": 0.57, "error_pct": 0.2, "cpu_avg": 90.6},
+
+  {"product": "SearchEngine", "version": "v1.0", "config": "24Core64GB", "data_size": 100000,  "threads": 300, "tps": 1198.4,"response_sec": 0.08, "error_pct": 0.0, "cpu_avg": 58.7},
+  {"product": "SearchEngine", "version": "v1.0", "config": "24Core64GB", "data_size": 500000,  "threads": 300, "tps": 863.2, "response_sec": 0.12, "error_pct": 0.0, "cpu_avg": 67.1},
+  {"product": "SearchEngine", "version": "v1.0", "config": "24Core64GB", "data_size": 1000000, "threads": 300, "tps": 652.7, "response_sec": 0.15, "error_pct": 0.0, "cpu_avg": 73.5},
+  {"product": "SearchEngine", "version": "v1.0", "config": "24Core64GB", "data_size": 5000000, "threads": 300, "tps": 355.8, "response_sec": 0.28, "error_pct": 0.1, "cpu_avg": 81.9},
+  {"product": "SearchEngine", "version": "v1.0", "config": "24Core64GB", "data_size": 10000000,"threads": 300, "tps": 248.3, "response_sec": 0.40, "error_pct": 0.1, "cpu_avg": 87.3},
+
+  {"product": "SearchEngine", "version": "v1.1", "config": "8Core16GB",  "data_size": 100000,  "threads": 100, "tps": 472.1, "response_sec": 0.21, "error_pct": 0.0, "cpu_avg": 69.8},
+  {"product": "SearchEngine", "version": "v1.1", "config": "8Core16GB",  "data_size": 500000,  "threads": 100, "tps": 338.4, "response_sec": 0.30, "error_pct": 0.0, "cpu_avg": 76.3},
+  {"product": "SearchEngine", "version": "v1.1", "config": "8Core16GB",  "data_size": 1000000, "threads": 100, "tps": 256.9, "response_sec": 0.39, "error_pct": 0.0, "cpu_avg": 81.7},
+  {"product": "SearchEngine", "version": "v1.1", "config": "8Core16GB",  "data_size": 5000000, "threads": 100, "tps": 140.2, "response_sec": 0.71, "error_pct": 0.1, "cpu_avg": 87.4},
+  {"product": "SearchEngine", "version": "v1.1", "config": "8Core16GB",  "data_size": 10000000,"threads": 100, "tps": 98.7,  "response_sec": 1.01, "error_pct": 0.3, "cpu_avg": 92.1},
+
+  {"product": "SearchEngine", "version": "v1.1", "config": "16Core32GB", "data_size": 100000,  "threads": 200, "tps": 891.3, "response_sec": 0.11, "error_pct": 0.0, "cpu_avg": 63.2},
+  {"product": "SearchEngine", "version": "v1.1", "config": "16Core32GB", "data_size": 500000,  "threads": 200, "tps": 638.7, "response_sec": 0.16, "error_pct": 0.0, "cpu_avg": 70.5},
+  {"product": "SearchEngine", "version": "v1.1", "config": "16Core32GB", "data_size": 1000000, "threads": 200, "tps": 484.2, "response_sec": 0.21, "error_pct": 0.0, "cpu_avg": 76.8},
+  {"product": "SearchEngine", "version": "v1.1", "config": "16Core32GB", "data_size": 5000000, "threads": 200, "tps": 263.8, "response_sec": 0.38, "error_pct": 0.0, "cpu_avg": 83.7},
+  {"product": "SearchEngine", "version": "v1.1", "config": "16Core32GB", "data_size": 10000000,"threads": 200, "tps": 185.1, "response_sec": 0.54, "error_pct": 0.1, "cpu_avg": 89.2},
+
+  {"product": "SearchEngine", "version": "v2.0", "config": "8Core16GB",  "data_size": 100000,  "threads": 100, "tps": 531.4, "response_sec": 0.19, "error_pct": 0.0, "cpu_avg": 66.2},
+  {"product": "SearchEngine", "version": "v2.0", "config": "8Core16GB",  "data_size": 500000,  "threads": 100, "tps": 381.2, "response_sec": 0.26, "error_pct": 0.0, "cpu_avg": 73.1},
+  {"product": "SearchEngine", "version": "v2.0", "config": "8Core16GB",  "data_size": 1000000, "threads": 100, "tps": 289.7, "response_sec": 0.35, "error_pct": 0.0, "cpu_avg": 79.4},
+  {"product": "SearchEngine", "version": "v2.0", "config": "8Core16GB",  "data_size": 5000000, "threads": 100, "tps": 158.3, "response_sec": 0.63, "error_pct": 0.0, "cpu_avg": 85.6},
+  {"product": "SearchEngine", "version": "v2.0", "config": "8Core16GB",  "data_size": 10000000,"threads": 100, "tps": 111.2, "response_sec": 0.90, "error_pct": 0.1, "cpu_avg": 91.3},
+
+  {"product": "SearchEngine", "version": "v2.0", "config": "16Core32GB", "data_size": 100000,  "threads": 200, "tps": 1002.7,"response_sec": 0.10, "error_pct": 0.0, "cpu_avg": 60.4},
+  {"product": "SearchEngine", "version": "v2.0", "config": "16Core32GB", "data_size": 500000,  "threads": 200, "tps": 719.4, "response_sec": 0.14, "error_pct": 0.0, "cpu_avg": 68.9},
+  {"product": "SearchEngine", "version": "v2.0", "config": "16Core32GB", "data_size": 1000000, "threads": 200, "tps": 546.1, "response_sec": 0.18, "error_pct": 0.0, "cpu_avg": 75.2},
+  {"product": "SearchEngine", "version": "v2.0", "config": "16Core32GB", "data_size": 5000000, "threads": 200, "tps": 297.6, "response_sec": 0.34, "error_pct": 0.0, "cpu_avg": 82.8},
+  {"product": "SearchEngine", "version": "v2.0", "config": "16Core32GB", "data_size": 10000000,"threads": 200, "tps": 208.9, "response_sec": 0.48, "error_pct": 0.0, "cpu_avg": 88.5},
+
+  {"product": "SearchEngine", "version": "v2.0", "config": "24Core64GB", "data_size": 100000,  "threads": 300, "tps": 1421.3,"response_sec": 0.07, "error_pct": 0.0, "cpu_avg": 55.1},
+  {"product": "SearchEngine", "version": "v2.0", "config": "24Core64GB", "data_size": 500000,  "threads": 300, "tps": 1022.8,"response_sec": 0.10, "error_pct": 0.0, "cpu_avg": 63.7},
+  {"product": "SearchEngine", "version": "v2.0", "config": "24Core64GB", "data_size": 1000000, "threads": 300, "tps": 774.5, "response_sec": 0.13, "error_pct": 0.0, "cpu_avg": 70.3},
+  {"product": "SearchEngine", "version": "v2.0", "config": "24Core64GB", "data_size": 5000000, "threads": 300, "tps": 422.1, "response_sec": 0.24, "error_pct": 0.0, "cpu_avg": 79.6},
+  {"product": "SearchEngine", "version": "v2.0", "config": "24Core64GB", "data_size": 10000000,"threads": 300, "tps": 295.7, "response_sec": 0.34, "error_pct": 0.0, "cpu_avg": 85.9}
+]

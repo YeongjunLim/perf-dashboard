@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Performance Analysis Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      padding: 20px 32px;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 600; }
+    header p  { font-size: 0.85rem; color: #94a3b8; margin-top: 4px; }
+
+    nav {
+      display: flex;
+      gap: 4px;
+      background: #fff;
+      padding: 0 32px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    nav button {
+      padding: 14px 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #64748b;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    nav button.active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 600; }
+    nav button:hover:not(.active) { color: #1e293b; }
+
+    main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .card h2 { font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 16px; }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 20px;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 0.8rem; font-weight: 500; color: #6b7280; }
+    select, input[type="number"] {
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #374151;
+      background: #fff;
+      min-width: 140px;
+    }
+    select:focus, input:focus { outline: none; border-color: #3b82f6; }
+
+    button.btn {
+      padding: 9px 20px;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    button.btn:hover { background: #2563eb; }
+
+    .chart-wrap { position: relative; height: 320px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { background: #f8fafc; text-align: left; padding: 10px 14px; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #374151; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-box { background: #f8fafc; border-radius: 10px; padding: 16px 20px; border-left: 4px solid #3b82f6; }
+    .stat-box.green  { border-left-color: #10b981; }
+    .stat-box.orange { border-left-color: #f59e0b; }
+    .stat-box.red    { border-left-color: #ef4444; }
+    .stat-box .label { font-size: 0.78rem; color: #6b7280; margin-bottom: 6px; }
+    .stat-box .value { font-size: 1.6rem; font-weight: 700; color: #1e293b; }
+    .stat-box .unit  { font-size: 0.78rem; color: #94a3b8; margin-left: 4px; }
+
+    .result-box {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      border: 1px solid #bfdbfe;
+    }
+    .result-box .big { font-size: 3.5rem; font-weight: 800; color: #1d4ed8; }
+    .result-box .desc { font-size: 0.9rem; color: #3b82f6; margin-top: 6px; }
+    .result-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; text-align: left; }
+    .result-detail .item { background: #fff; border-radius: 8px; padding: 12px 16px; }
+    .result-detail .item .k { font-size: 0.78rem; color: #6b7280; }
+    .result-detail .item .v { font-size: 1rem; font-weight: 600; color: #1e293b; margin-top: 2px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } .result-detail { grid-template-columns: 1fr; } }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.75rem; font-weight: 500; }
+    .badge.green  { background: #d1fae5; color: #065f46; }
+    .badge.orange { background: #fef3c7; color: #92400e; }
+    .badge.red    { background: #fee2e2; color: #991b1b; }
+
+    .empty { text-align: center; padding: 48px 0; color: #94a3b8; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Performance Analysis Dashboard</h1>
+  <p>JMeter 성능 측정 데이터 기반 분석 · Power Law 외삽법을 활용한 서버 용량 예측</p>
+</header>
+
+<nav>
+  <button class="active" onclick="switchTab('analysis', this)">📊 성능 분석</button>
+  <button onclick="switchTab('predict', this)">🖥 서버 대수 계산기</button>
+  <button onclick="switchTab('trend', this)">📈 버전 추이</button>
+</nav>
+
+<main>
+
+  <!-- ── 성능 분석 탭 ── -->
+  <div id="tab-analysis" class="tab-panel active">
+    <div class="card">
+      <div class="controls">
+        <div class="control-group">
+          <label>제품</label>
+          <select id="a-product" onchange="loadVersions('a')"></select>
+        </div>
+        <div class="control-group">
+          <label>버전</label>
+          <select id="a-version"></select>
+        </div>
+        <button class="btn" onclick="loadReport()">조회</button>
+      </div>
+    </div>
+
+    <div id="analysis-result" class="empty">제품과 버전을 선택한 뒤 조회하세요.</div>
+  </div>
+
+  <!-- ── 서버 대수 계산기 탭 ── -->
+  <div id="tab-predict" class="tab-panel">
+    <div class="grid-2">
+      <div class="card">
+        <h2>입력 조건</h2>
+        <div class="controls" style="flex-direction:column; align-items:stretch;">
+          <div class="control-group">
+            <label>제품</label>
+            <select id="p-product" onchange="loadConfigs()"></select>
+          </div>
+          <div class="control-group">
+            <label>서버 스펙</label>
+            <select id="p-config"></select>
+          </div>
+          <div class="control-group">
+            <label>목표 데이터 건수</label>
+            <input type="number" id="p-data-size" placeholder="예: 3000000" min="1" />
+          </div>
+          <div class="control-group">
+            <label>목표 TPS</label>
+            <input type="number" id="p-tps" placeholder="예: 500" min="1" />
+          </div>
+          <button class="btn" style="margin-top:8px;" onclick="runPredict()">예측하기</button>
+        </div>
+      </div>
+
+      <div id="predict-result" class="card">
+        <h2>예측 결과</h2>
+        <div class="empty">좌측에서 조건을 입력하세요.</div>
+      </div>
+    </div>
+
+    <div class="card" id="predict-chart-card" style="display:none;">
+      <h2>Power Law 피팅 곡선</h2>
+      <div class="chart-wrap"><canvas id="chart-predict"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── 버전 추이 탭 ── -->
+  <div id="tab-trend" class="tab-panel">
+    <div class="card">
+      <div class="controls">
+        <div class="control-group">
+          <label>제품</label>
+          <select id="t-product"></select>
+        </div>
+        <button class="btn" onclick="loadTrend()">조회</button>
+      </div>
+    </div>
+    <div id="trend-result" class="empty">제품을 선택한 뒤 조회하세요.</div>
+  </div>
+
+</main>
+
+<script>
+const COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+let predictChart = null;
+
+// ── 공통 유틸 ──────────────────────────────────────────
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'API 오류'); }
+  return res.json();
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function badge(val) {
+  if (val === 0) return `<span class="badge green">0.0%</span>`;
+  if (val < 0.5) return `<span class="badge orange">${val}%</span>`;
+  return `<span class="badge red">${val}%</span>`;
+}
+
+function formatNum(n) { return Number(n).toLocaleString(); }
+
+// ── 초기화 ─────────────────────────────────────────────
+async function init() {
+  try {
+    const products = await api('/api/products');
+    ['a-product','p-product','t-product'].forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = products.map(p => `<option value="${p}">${p}</option>`).join('');
+    });
+    if (products.length) {
+      await loadVersions('a');
+      await loadConfigs();
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function loadVersions(prefix) {
+  const product = document.getElementById(prefix + '-product').value;
+  const versions = await api('/api/versions/' + encodeURIComponent(product));
+  const sel = document.getElementById(prefix + '-version');
+  sel.innerHTML = versions.map(v => `<option value="${v}">${v}</option>`).join('');
+}
+
+async function loadConfigs() {
+  const product = document.getElementById('p-product').value;
+  const configs = await api('/api/configs/' + encodeURIComponent(product));
+  const sel = document.getElementById('p-config');
+  sel.innerHTML = configs.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+// ── 성능 분석 ──────────────────────────────────────────
+async function loadReport() {
+  const product = document.getElementById('a-product').value;
+  const version = document.getElementById('a-version').value;
+  const data = await api(`/api/report/${encodeURIComponent(product)}/${encodeURIComponent(version)}`);
+  const configs = data.configs;
+  const configNames = Object.keys(configs);
+
+  // 대표 stat (최고 TPS 기준)
+  let maxTps = 0, minResp = 999, maxErrPct = 0;
+  configNames.forEach(cfg => {
+    configs[cfg].forEach(r => {
+      if (r.tps > maxTps) maxTps = r.tps;
+      if (r.response_sec < minResp) minResp = r.response_sec;
+      if (r.error_pct > maxErrPct) maxErrPct = r.error_pct;
+    });
+  });
+
+  const html = `
+    <div class="stat-grid">
+      <div class="stat-box green"><div class="label">최고 TPS</div><div class="value">${maxTps.toFixed(1)}<span class="unit">req/s</span></div></div>
+      <div class="stat-box"><div class="label">최저 응답시간</div><div class="value">${minResp.toFixed(2)}<span class="unit">sec</span></div></div>
+      <div class="stat-box ${maxErrPct > 0.5 ? 'red' : maxErrPct > 0 ? 'orange' : 'green'}"><div class="label">최대 에러율</div><div class="value">${maxErrPct.toFixed(1)}<span class="unit">%</span></div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card"><h2>스펙별 TPS (데이터 건수 기준)</h2><div class="chart-wrap"><canvas id="chart-tps"></canvas></div></div>
+      <div class="card"><h2>스펙별 응답시간 (초)</h2><div class="chart-wrap"><canvas id="chart-resp"></canvas></div></div>
+    </div>
+
+    <div class="card">
+      <h2>측정 데이터 상세</h2>
+      <table>
+        <thead><tr><th>스펙</th><th>데이터 건수</th><th>스레드</th><th>TPS</th><th>응답시간(s)</th><th>에러율</th><th>CPU 평균</th></tr></thead>
+        <tbody>
+          ${configNames.flatMap(cfg => configs[cfg].map(r => `
+            <tr>
+              <td><strong>${r.config}</strong></td>
+              <td>${formatNum(r.data_size)}</td>
+              <td>${r.threads}</td>
+              <td><strong>${r.tps.toFixed(1)}</strong></td>
+              <td>${r.response_sec.toFixed(2)}</td>
+              <td>${badge(r.error_pct)}</td>
+              <td>${r.cpu_avg.toFixed(1)}%</td>
+            </tr>`)).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('analysis-result').innerHTML = html;
+  document.getElementById('analysis-result').className = '';
+
+  // 데이터 건수 목록 (x축)
+  const allSizes = [...new Set(configNames.flatMap(cfg => configs[cfg].map(r => r.data_size)))].sort((a,b)=>a-b);
+  const labels = allSizes.map(s => s >= 1000000 ? (s/1000000)+'M' : s >= 1000 ? (s/1000)+'K' : s);
+
+  drawLineChart('chart-tps', labels,
+    configNames.map((cfg, i) => ({
+      label: cfg,
+      data: allSizes.map(sz => { const r = configs[cfg].find(x=>x.data_size===sz); return r ? r.tps : null; }),
+      borderColor: COLORS[i], backgroundColor: COLORS[i]+'22', tension: 0.3, fill: false
+    })),
+    'TPS'
+  );
+  drawLineChart('chart-resp', labels,
+    configNames.map((cfg, i) => ({
+      label: cfg,
+      data: allSizes.map(sz => { const r = configs[cfg].find(x=>x.data_size===sz); return r ? r.response_sec : null; }),
+      borderColor: COLORS[i], backgroundColor: COLORS[i]+'22', tension: 0.3, fill: false
+    })),
+    '응답시간(s)'
+  );
+}
+
+function drawLineChart(id, labels, datasets, yLabel) {
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        x: { title: { display: true, text: '데이터 건수' } },
+        y: { title: { display: true, text: yLabel }, beginAtZero: false }
+      }
+    }
+  });
+}
+
+// ── 서버 대수 예측 ─────────────────────────────────────
+async function runPredict() {
+  const product    = document.getElementById('p-product').value;
+  const config     = document.getElementById('p-config').value;
+  const dataSize   = parseInt(document.getElementById('p-data-size').value);
+  const targetTps  = parseFloat(document.getElementById('p-tps').value);
+
+  if (!dataSize || !targetTps) { alert('데이터 건수와 목표 TPS를 입력하세요.'); return; }
+
+  try {
+    const r = await api('/api/predict', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ product, config, target_data_size: dataSize, target_tps: targetTps })
+    });
+
+    document.getElementById('predict-result').innerHTML = `
+      <h2>예측 결과</h2>
+      <div class="result-box">
+        <div class="big">${r.server_count}</div>
+        <div class="desc">대의 <strong>${r.config}</strong> 서버가 필요합니다</div>
+      </div>
+      <div class="result-detail">
+        <div class="item"><div class="k">서버 1대당 예상 TPS</div><div class="v">${r.predicted_tps_per_server.toLocaleString()} req/s</div></div>
+        <div class="item"><div class="k">목표 TPS</div><div class="v">${r.target_tps.toLocaleString()} req/s</div></div>
+        <div class="item"><div class="k">데이터 건수</div><div class="v">${r.target_data_size.toLocaleString()} 건</div></div>
+        <div class="item"><div class="k">Power Law (a · x^b)</div><div class="v">a=${r.power_law_a}, b=${r.power_law_b}</div></div>
+      </div>`;
+
+    // Power Law 차트
+    document.getElementById('predict-chart-card').style.display = '';
+    if (predictChart) predictChart.destroy();
+    predictChart = new Chart(document.getElementById('chart-predict'), {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: '측정값',
+            data: r.measured_points,
+            backgroundColor: '#ef4444',
+            pointRadius: 7, pointHoverRadius: 9,
+            showLine: false
+          },
+          {
+            label: 'Power Law 피팅 곡선',
+            data: r.curve_points,
+            borderColor: '#3b82f6', backgroundColor: '#3b82f622',
+            pointRadius: 0, showLine: true, tension: 0.4, fill: true
+          },
+          {
+            label: '목표 지점',
+            data: [{ x: r.target_data_size, y: r.predicted_tps_per_server }],
+            backgroundColor: '#10b981',
+            pointRadius: 10, pointStyle: 'star', showLine: false
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' }, tooltip: {
+          callbacks: { label: ctx => `데이터: ${formatNum(ctx.parsed.x)}건, TPS: ${ctx.parsed.y.toFixed(1)}` }
+        }},
+        scales: {
+          x: { title: { display: true, text: '데이터 건수' } },
+          y: { title: { display: true, text: 'TPS (req/s)' }, beginAtZero: false }
+        }
+      }
+    });
+  } catch(e) { alert(e.message); }
+}
+
+// ── 버전 추이 ──────────────────────────────────────────
+async function loadTrend() {
+  const product = document.getElementById('t-product').value;
+  const data = await api('/api/trend/' + encodeURIComponent(product));
+  const trend = data.trend;
+
+  const configs   = [...new Set(trend.map(t => t.config))];
+  const versions  = [...new Set(trend.map(t => t.version))];
+
+  const html = `
+    <div class="grid-2">
+      <div class="card"><h2>버전별 평균 TPS</h2><div class="chart-wrap"><canvas id="chart-t-tps"></canvas></div></div>
+      <div class="card"><h2>버전별 평균 응답시간 (초)</h2><div class="chart-wrap"><canvas id="chart-t-resp"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h2>버전별 성능 요약</h2>
+      <table>
+        <thead><tr><th>버전</th><th>스펙</th><th>평균 TPS</th><th>평균 응답시간(s)</th><th>평균 에러율</th></tr></thead>
+        <tbody>
+          ${trend.map(t => `
+            <tr>
+              <td><strong>${t.version}</strong></td>
+              <td>${t.config}</td>
+              <td>${t.avg_tps.toFixed(1)}</td>
+              <td>${t.avg_response_sec.toFixed(3)}</td>
+              <td>${badge(t.avg_error_pct)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('trend-result').innerHTML = html;
+  document.getElementById('trend-result').className = '';
+
+  // 버전별 평균 TPS 차트 (스펙별 라인)
+  new Chart(document.getElementById('chart-t-tps'), {
+    type: 'line',
+    data: {
+      labels: versions,
+      datasets: configs.map((cfg, i) => ({
+        label: cfg,
+        data: versions.map(v => { const t = trend.find(x=>x.version===v&&x.config===cfg); return t ? t.avg_tps : null; }),
+        borderColor: COLORS[i], backgroundColor: COLORS[i]+'22', tension: 0.3, fill: false
+      }))
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } },
+      scales: { y: { title: { display: true, text: 'TPS' }, beginAtZero: false } } }
+  });
+
+  new Chart(document.getElementById('chart-t-resp'), {
+    type: 'line',
+    data: {
+      labels: versions,
+      datasets: configs.map((cfg, i) => ({
+        label: cfg,
+        data: versions.map(v => { const t = trend.find(x=>x.version===v&&x.config===cfg); return t ? t.avg_response_sec : null; }),
+        borderColor: COLORS[i], backgroundColor: COLORS[i]+'22', tension: 0.3, fill: false
+      }))
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } },
+      scales: { y: { title: { display: true, text: '응답시간(s)' }, beginAtZero: false } } }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
